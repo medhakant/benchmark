@@ -25,12 +25,23 @@ char SCCSid[] = "@(#) @(#)pipe.c:3.3 -- 5/15/91 19:30:20";
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/time.h>
+
+static double getFloatTime()
+{
+        struct timeval t;
+
+        gettimeofday(&t, 0);
+        return (double) t.tv_sec + (double) t.tv_usec / 1000000.0;
+}
 
 unsigned long iter;
+double start, end;
 
 void report()
 {
 	fprintf(stderr,"COUNT|%ld|1|lps\n", iter);
+	fprintf(stderr,"Time: %.6f", end-start); 
 	exit(0);
 }
 
@@ -48,6 +59,7 @@ char	*argv[];
 		}
 
 	duration = atoi(argv[1]);
+	start = getFloatTime();
 
 	pipe(pvec);
 
@@ -66,5 +78,6 @@ char	*argv[];
 		iter++;
 	}
 	// asm("int $101");
+	end = getFloatTime();
 	report();
 }
